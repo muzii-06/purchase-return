@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Wise Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1200px;
+        }
+        .table th {
+            background: #007bff;
+            color: #ffffff;
+        }
+        .summary-row {
+            background: #e9ecef;
+            font-weight: bold;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4"> Purchase Return Report Item Wise </h2>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">From</label>
+                <input type="date" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">To</label>
+                <input type="date" class="form-control">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered" id="reportTable">
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Ctn</th>
+                        <th>DOZ</th>
+                        <th>Pcs</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Item A</td>
+                        <td>5</td>
+                        <td>2</td>
+                        <td>10</td>
+                        <td>12500</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="summary-row">
+                        <td colspan="1" class="text-end">Total</td>
+                        <td id="totalCtn">0</td>
+                        <td id="totalDzn">0</td>
+                        <td id="totalPcs">0</td>
+                        <td id="totalAmount">0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="btn-container mt-3">
+            <button class="btn btn-secondary">Back to Dashboard</button>
+            <button class="btn btn-success">Print</button>
+            <button class="btn btn-success">WhatsApp</button>
+            <button class="btn btn-danger" onclick="downloadPdf()">Download Pdf</button>
+            <button class="btn btn-warning">Send SMS</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateTotals() {
+            let totalCtn = 0, totalDzn = 0, totalPcs = 0, totalAmount = 0;
+            document.querySelectorAll("#reportTable tbody tr").forEach(row => {
+                totalCtn += parseInt(row.children[1].innerText) || 0;
+                totalDzn += parseInt(row.children[2].innerText) || 0;
+                totalPcs += parseInt(row.children[3].innerText) || 0;
+                totalAmount += parseInt(row.children[4].innerText) || 0;
+            });
+            document.getElementById("totalCtn").innerText = totalCtn;
+            document.getElementById("totalDzn").innerText = totalDzn;
+            document.getElementById("totalPcs").innerText = totalPcs;
+            document.getElementById("totalAmount").innerText = totalAmount;
+        }
+
+        function downloadPdf() {
+            let tableRows = "";
+            document.querySelectorAll("#reportTable tbody tr").forEach(row => {
+                tableRows += `<tr>${row.innerHTML}</tr>`;
+            });
+
+            const totals = {
+                ctn: document.getElementById("totalCtn").innerText,
+                dzn: document.getElementById("totalDzn").innerText,
+                pcs: document.getElementById("totalPcs").innerText,
+                amount: document.getElementById("totalAmount").innerText
+            };
+
+            localStorage.setItem("itemReportData", JSON.stringify({ rows: tableRows, totals }));
+            window.open('print_purchase_return_item_wise.html', '_blank');
+        }
+
+        document.addEventListener("DOMContentLoaded", calculateTotals);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
